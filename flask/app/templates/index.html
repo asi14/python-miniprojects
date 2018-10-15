@@ -1,8 +1,15 @@
 <html>
 	<head>
-		<title>{{ title }} - Flask</title>
+		{% if title %}
+			<title>{{ title }} - Flask</title>
+		{% else %}
+			<title>Welcome to Project</title>
+		{% endif %}
 	</head>
 	<body>
 		<h1>Welcome Back, {{ user.username }}</h1>	
+		{% for post in posts %}
+			<p><b>{{ post.author.username }}</b>: {{ post.body }}</p>
+		{% endfor %}
 	</body>
 <html>
