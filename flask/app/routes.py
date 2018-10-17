@@ -16,3 +16,8 @@ def index():
 		}
 	]
 	return render_template('index.html',title='Home',user=user,posts=posts)	
+
+@app.route('/software')
+def software():
+	print(app.root_path)
+	return render_template('template.html')
