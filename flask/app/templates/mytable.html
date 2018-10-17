@@ -209,32 +209,17 @@
 											</p>
 											<table>
 												<tr>
-													<td><h4>Header 4 test</h4></td>
-													<td><h5>Header 5 test</h5></td>
-													<td><h6>Header 6 test</h6></td>
+													{% for header in headers %}
+														<td><h4>{{ header }}</h4></td>
+													{% endfor %}
 												</tr>
-												<tr>
-													<td>
-														<ul>
-															<li>Item 1</li>
-															<li>Item 2</li>
-															<li>Item 3</li>
-														</ul>
-													</td>
-													<td><a href="http://www.engin.umich.edu/college/" >Link</a></td>
-													<td></td>
-												</tr>
-												<tr>
-													<td></td>
-													<td></td>
-													<td></td>
-												</tr>
-												<tr>
-													<td></td>
-													<td></td>
-													<td></td>
-												</tr>
-												
+												{% for row in rows %}
+													<tr>
+														{% for cell in row %}
+															<td>{{ cell }}</td>
+														{% endfor %}
+													</tr>
+												{% endfor %}
 											</table>
 										</div>
 									</div>
