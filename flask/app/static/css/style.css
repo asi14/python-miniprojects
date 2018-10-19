@@ -595,7 +595,7 @@ footer.site-footer {
   background: #00274c;
   height: auto;
   z-index: 15;
-  position: relative;
+  /*position: relative; this setting covered the table */ 
   bottom: 0;
   font: 12px FontSiteSansRoman,arial,sans-serif;
   line-height: em;
