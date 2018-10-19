@@ -5,23 +5,45 @@ import random
 
 cards = []
 exposed = []
-for i in range(8):
-    cards.append(i)
-    cards.append(i)
-    print(cards)
-for i in range(16):
-    exposed.append(False)
+
+selected=-1
+
 
 # helper function to initialize globals
 def new_game():
+    global exposed
     global cards
-    random.shuffle(cards)  
+    cards = []
+    exposed = []
+    for i in range(8):
+        cards.append(i)
+        cards.append(i)
+        random.shuffle(cards)  
+    for i in range(16):
+        exposed.append(False)
+
 
      
 # define event handlers
 def mouseclick(pos):
     # add game state logic here
-    pass
+    global exposed
+    global selected
+    if exposed[pos[0]/50] == True:
+        pass
+    elif selected == -1:
+        exposed[pos[0]/50]=True #for FIRST card
+        selected = pos[0]/50
+    elif selected == pos[0]/50:
+        exposed[pos[0]/50]=True #for SECOND card
+        #note: selected has already been set to True by this point
+        selected =-1
+    else:
+        #how to handle when loss given?
+        exposed[selected]=False
+        exposed[pos[0]/50]=False
+        selected=-1
+        
     
                         
 # cards are logically 50x100 pixels in size    
