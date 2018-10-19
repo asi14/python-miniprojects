@@ -6,7 +6,8 @@ import random
 cards = []
 exposed = []
 
-selected=-1
+selected=[-1,-1]
+isCorrect=True
 
 
 # helper function to initialize globals
@@ -31,23 +32,26 @@ def mouseclick(pos):
     global selected
     if exposed[pos[0]/50] == True:
         pass
-    elif selected == -1:
+    elif selected[0] == -1:
         exposed[pos[0]/50]=True #for FIRST card
-        selected = pos[0]/50
-    elif selected == pos[0]/50:
+        selected[0] = pos[0]/50
+    elif selected[0] == pos[0]/50:
         exposed[pos[0]/50]=True #for SECOND card
         #note: selected has already been set to True by this point
-        selected =-1
+        selected[0] =-1
+        isCorrect=True
     else:
+        print('ran')
         #how to handle when loss given?
-        exposed[selected]=False
-        exposed[pos[0]/50]=False
-        selected=-1
+        selected[1]=exposed[pos[0]/50]
+        exposed[pos[0]/50]=True
+        isCorrect=False
         
     
                         
 # cards are logically 50x100 pixels in size    
 def draw(canvas):
+    print('b')
     left_coord=0
 
     for i in range(16):
@@ -55,6 +59,15 @@ def draw(canvas):
         if exposed[i]:
             canvas.draw_text(str(cards[i]),(left_coord + 17,55),30,"White")
         left_coord+=50
+    left_coord=0
+    if isCorrect == False:
+        print('a')
+        global selected
+        exposed[select[0]]=False
+        exposed[select[1]]=False
+        selected=[-1,-1]
+        
+        
         
 
 
