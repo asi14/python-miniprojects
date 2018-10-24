@@ -54,11 +54,12 @@ class Hand:
         self.cards = []
 
     def __str__(self):
-        output = ''
-        ouput+=[card for card in cards]
+        output = 'Hand Contains '
+        for card in self.cards:
+            output+=str(card) + ' '
         return output
     def add_card(self, card):
-        self.cards.append(Card())
+        self.cards.append(card)
 
     def get_value(self):
         # count aces as 1, if the hand has an ace, then add 10 to hand value if it doesn't bust
@@ -66,22 +67,26 @@ class Hand:
    
     def draw(self, canvas, pos):
         pass	# draw a hand on the canvas, use the draw method for cards
- 
+        
         
 # define deck class 
 class Deck:
     def __init__(self):
-        pass	# create a Deck object
+        self.cards = [Card(suit,rank) for suit in SUITS for rank in RANKS]
 
     def shuffle(self):
-        # shuffle the deck 
-        pass    # use random.shuffle()
+        random.shuffle(self.cards)
 
     def deal_card(self):
-        pass	# deal a card object from the deck
+        card_output = self.cards[len(self.cards)-1]
+        self.cards.remove(card_output)
+        return card_output
     
     def __str__(self):
-        pass	# return a string representing the deck
+        output = 'Deck Contains '
+        for card in self.cards:
+            output+=str(card) + ' '
+        return output
 
 
 
