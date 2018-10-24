@@ -14,6 +14,7 @@ card_back = simplegui.load_image("http://storage.googleapis.com/codeskulptor-ass
 
 # initialize some useful global variables
 in_play = False
+player_busted=False
 outcome = ""
 score = 0
 
@@ -21,7 +22,6 @@ score = 0
 SUITS = ('C', 'S', 'H', 'D')
 RANKS = ('A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K')
 VALUES = {'A':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, 'T':10, 'J':10, 'Q':10, 'K':10}
-
 
 # define card class
 class Card:
@@ -62,12 +62,14 @@ class Hand:
         self.cards.append(card)
 
     def get_value(self):
-        # count aces as 1, if the hand has an ace, then add 10 to hand value if it doesn't bust
-        pass	# compute the value of the hand, see Blackjack video
+        global VALUES
+        value=0
+        for card in self.cards:
+            value+=VALUES[card.rank]
+        return value
    
     def draw(self, canvas, pos):
         pass	# draw a hand on the canvas, use the draw method for cards
-        
         
 # define deck class 
 class Deck:
@@ -92,21 +94,45 @@ class Deck:
 
 #define event handlers for buttons
 def deal():
-    global outcome, in_play
+    global outcome, in_play, CARD_DECK, PLAYER_HAND, DEALER_HAND
 
-    # your code goes here
-    
+    CARD_DECK.shuffle()
+    dealer = True
+    for i in range(4):
+        if dealer:
+            DEALER_HAND.add_card(CARD_DECK.deal_card())
+            dealer=False
+        else:
+            PLAYER_HAND.add_card(CARD_DECK.deal_card())
+            dealer=True
+    print('PLAYER HAND: \n' +str(len(PLAYER_HAND.cards)))
+    print('DEALER_HAND: \n' +str(len(DEALER_HAND.cards)))
     in_play = True
 
 def hit():
-    pass	# replace with your code below
- 
-    # if the hand is in play, hit the player
-   
-    # if busted, assign a message to outcome, update in_play and score
-       
+    global PLAYER_HAND
+    global CARD_DECK
+    global player_busted
+    if PLAYER_HAND.get_value() <=21:
+        PLAYER_HAND.add_card(CARD_DECK.deal_card())
+        print('PLAYER HAND: \n' +str(len(PLAYER_HAND.cards)))
+    else:
+        print("You have Busted")
+        player_busted = True
 def stand():
-    pass	# replace with your code below
+    global player_busted, DEALER_HAND, CARD_DECK
+    if player_busted == True:
+        print('Reminder: You have Busted')
+    else:
+        while DEALER_HAND.get_value() <= 16:
+            DEALER_HAND.add_card(CARD_DECK.deal_card())
+            print('DEALDER HAND: ' + str(DEALER_HAND.get_value()))
+    print('PLAYER HAND: ' + str(PLAYER_HAND.get_value()))
+    print('DEALDER HAND: ' + str(DEALER_HAND.get_value()))
+    if PLAYER_HAND.get_value() <= DEALER_HAND.get_value():
+        print('You Lose')
+    else:
+        print('You Win')
    
     # if hand is in play, repeatedly hit dealer until his hand has value 17 or more
 
@@ -130,6 +156,9 @@ frame.add_button("Hit",  hit, 200)
 frame.add_button("Stand", stand, 200)
 frame.set_draw_handler(draw)
 
+CARD_DECK = Deck()
+PLAYER_HAND = Hand()
+DEALER_HAND = Hand()
 
 # get things rolling
 deal()
