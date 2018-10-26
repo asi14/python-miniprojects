@@ -117,22 +117,24 @@ def hit():
         PLAYER_HAND.add_card(CARD_DECK.deal_card())
         print('PLAYER HAND: \n' +str(len(PLAYER_HAND.cards)))
     else:
-        print("You have Busted")
+        print("Player has Busted. Player loses.")
         player_busted = True
 def stand():
     global player_busted, DEALER_HAND, CARD_DECK
     if player_busted == True:
-        print('Reminder: You have Busted')
+        print('Reminder: Player Busted. Player lost.')
     else:
         while DEALER_HAND.get_value() <= 16:
             DEALER_HAND.add_card(CARD_DECK.deal_card())
-            print('DEALDER HAND: ' + str(DEALER_HAND.get_value()))
-    print('PLAYER HAND: ' + str(PLAYER_HAND.get_value()))
-    print('DEALDER HAND: ' + str(DEALER_HAND.get_value()))
-    if PLAYER_HAND.get_value() <= DEALER_HAND.get_value():
-        print('You Lose')
-    else:
-        print('You Win')
+            print('DEALDER HAND VALUE: ' + str(DEALER_HAND.get_value()))
+        print('PLAYER HAND VALUE: ' + str(PLAYER_HAND.get_value()))
+        print('DEALDER HAND VALUE: ' + str(DEALER_HAND.get_value()))
+        if DEALER_HAND.get_value() >21: #dealer value more than 21
+            print('The Dealer has Busted. Player wins.')
+        elif PLAYER_HAND.get_value() <= DEALER_HAND.get_value():
+            print('Player has higher value. Player win')
+        else:
+            print('Dealer has higher value. Dealer wins.')
    
     # if hand is in play, repeatedly hit dealer until his hand has value 17 or more
 
