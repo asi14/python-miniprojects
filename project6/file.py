@@ -15,8 +15,11 @@ card_back = simplegui.load_image("http://storage.googleapis.com/codeskulptor-ass
 # initialize some useful global variables
 in_play = False
 player_busted=False
-outcome = ""
+outcome = "Game is in progress."
 score = 0
+
+#left margin for game text
+text_constant = 20
 
 # define globals for cards
 SUITS = ('C', 'S', 'H', 'D')
@@ -69,7 +72,16 @@ class Hand:
         return value
    
     def draw(self, canvas, pos):
-        pass	# draw a hand on the canvas, use the draw method for cards
+        left_pos = 0
+        iet=0
+        global card_images
+        #add indicator for more cards than 8
+        for card in self.cards:
+            if iet < 8:
+                card.draw(canvas,[left_pos,pos[1]])
+                left_pos+=CARD_SIZE[0]
+            iet+=1
+            
         
 # define deck class 
 class Deck:
@@ -95,6 +107,11 @@ class Deck:
 #define event handlers for buttons
 def deal():
     global outcome, in_play, CARD_DECK, PLAYER_HAND, DEALER_HAND
+    
+    #resets deck and hands
+    CARD_DECK = Deck()
+    PLAYER_HAND = Hand()
+    DEALER_HAND = Hand()
 
     CARD_DECK.shuffle()
     dealer = True
@@ -105,36 +122,35 @@ def deal():
         else:
             PLAYER_HAND.add_card(CARD_DECK.deal_card())
             dealer=True
-    print('PLAYER HAND: \n' +str(len(PLAYER_HAND.cards)))
-    print('DEALER_HAND: \n' +str(len(DEALER_HAND.cards)))
     in_play = True
+    outcome = "Game is in progress."
 
 def hit():
+    global outcome
     global PLAYER_HAND
     global CARD_DECK
-    global player_busted
+    global player_busted, in_play
     if PLAYER_HAND.get_value() <=21:
         PLAYER_HAND.add_card(CARD_DECK.deal_card())
-        print('PLAYER HAND: \n' +str(len(PLAYER_HAND.cards)))
     else:
-        print("Player has Busted. Player loses.")
+        outcome = "Player has Busted. Player loses."
         player_busted = True
+        in_play = False
 def stand():
-    global player_busted, DEALER_HAND, CARD_DECK
+    global player_busted, DEALER_HAND, CARD_DECK, in_play, outcome
     if player_busted == True:
-        print('Reminder: Player Busted. Player lost.')
+        outcome = 'Reminder: Player Busted. Player lost.'
     else:
         while DEALER_HAND.get_value() <= 16:
             DEALER_HAND.add_card(CARD_DECK.deal_card())
-            print('DEALDER HAND VALUE: ' + str(DEALER_HAND.get_value()))
-        print('PLAYER HAND VALUE: ' + str(PLAYER_HAND.get_value()))
-        print('DEALDER HAND VALUE: ' + str(DEALER_HAND.get_value()))
         if DEALER_HAND.get_value() >21: #dealer value more than 21
-            print('The Dealer has Busted. Player wins.')
+            outcome = 'The Dealer has Busted. Player wins.'
         elif PLAYER_HAND.get_value() <= DEALER_HAND.get_value():
-            print('Player has higher value. Player win')
+            outcome = 'Player has higher value. Player win'
         else:
-            print('Dealer has higher value. Dealer wins.')
+            outcome = 'Dealer has higher value. Dealer wins.'
+    in_play = False
+    print("Method complete")
    
     # if hand is in play, repeatedly hit dealer until his hand has value 17 or more
 
@@ -143,10 +159,20 @@ def stand():
 # draw handler    
 def draw(canvas):
     # test to make sure that card.draw works, replace with your code below
-    
-    card = Card("S", "A")
-    card.draw(canvas, [300, 300])
-
+    global text_constant,outcome, in_play,card_back,CARD_BACK_CENTER,CARD_BACK_SIZE
+    PLAYER_HAND.draw(canvas,[0,0])
+    DEALER_HAND.draw(canvas,[0,600-CARD_SIZE[1]])
+    canvas.draw_text("Blackjack",[text_constant,250],50,"Black")
+    canvas.draw_text("Brian Lee, CAEN Python Project No. 7",[text_constant,280],25,"Black")
+    canvas.draw_text("Number of Cards: %s" % len(PLAYER_HAND.cards),[text_constant,125],20,"Black")
+    canvas.draw_text("Number of Cards: %s" % len(DEALER_HAND.cards),[text_constant,480],20,"Black")
+    canvas.draw_text("Card Value: %s" % PLAYER_HAND.get_value(),[text_constant,150],20,"Black")
+    canvas.draw_text("Card Value: %s" % DEALER_HAND.get_value(),[text_constant,455],20,"Black")
+    canvas.draw_text("PLAYER", [450,137],35,"Black")
+    canvas.draw_text("DEALER", [450,463],35,"Black")
+    canvas.draw_text(outcome,[text_constant,310],25,"Black")
+    if in_play == True:
+        canvas.draw_image(card_back,CARD_BACK_CENTER,CARD_BACK_SIZE,(36,552),(CARD_SIZE))
 
 # initialization frame
 frame = simplegui.create_frame("Blackjack", 600, 600)
