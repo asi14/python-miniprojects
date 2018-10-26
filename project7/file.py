@@ -114,7 +114,10 @@ class Ship:
         global DELTA_T, ACC, ship_thrust_sound
         
         #update position
-        self.pos = [self.pos[0]+self.vel[0]*DELTA_T,self.pos[1]+self.vel[1]*DELTA_T]
+        if self.pos[0]-self.radius < WIDTH and self.pos[0] + self.radius > 0 and self.pos[1] - self.radius < HEIGHT and self.pos[1] + self.radius > 0:
+            self.pos = [self.pos[0]+self.vel[0]*DELTA_T,self.pos[1]+self.vel[1]*DELTA_T]
+        else:
+            self.pos = [self.pos[0]%800, self.pos[1]%600]
         if self.thrust:
             #update velocity
             angles = angle_to_vector(self.angle)
