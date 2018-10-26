@@ -26,6 +26,8 @@ SUITS = ('C', 'S', 'H', 'D')
 RANKS = ('A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K')
 VALUES = {'A':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, 'T':10, 'J':10, 'Q':10, 'K':10}
 
+wins = 0
+
 # define card class
 class Card:
     def __init__(self, suit, rank):
@@ -106,7 +108,12 @@ class Deck:
 
 #define event handlers for buttons
 def deal():
-    global outcome, in_play, CARD_DECK, PLAYER_HAND, DEALER_HAND
+    global outcome, in_play, CARD_DECK, PLAYER_HAND, DEALER_HAND,player_busted
+    
+    if in_play == True:
+        outcome = "Deck Reshuffled, counts as loss"
+    else:
+        outcome = "Game is in progress."
     
     #resets deck and hands
     CARD_DECK = Deck()
@@ -123,7 +130,8 @@ def deal():
             PLAYER_HAND.add_card(CARD_DECK.deal_card())
             dealer=True
     in_play = True
-    outcome = "Game is in progress."
+    player_busted=False
+    
 
 def hit():
     global outcome
@@ -132,12 +140,13 @@ def hit():
     global player_busted, in_play
     if PLAYER_HAND.get_value() <=21:
         PLAYER_HAND.add_card(CARD_DECK.deal_card())
+        outcome = "Game is in progress."
     else:
         outcome = "Player has Busted. Player loses."
         player_busted = True
         in_play = False
 def stand():
-    global player_busted, DEALER_HAND, CARD_DECK, in_play, outcome
+    global player_busted, DEALER_HAND, CARD_DECK, in_play, outcome,wins
     if player_busted == True:
         outcome = 'Reminder: Player Busted. Player lost.'
     else:
@@ -145,12 +154,13 @@ def stand():
             DEALER_HAND.add_card(CARD_DECK.deal_card())
         if DEALER_HAND.get_value() >21: #dealer value more than 21
             outcome = 'The Dealer has Busted. Player wins.'
-        elif PLAYER_HAND.get_value() <= DEALER_HAND.get_value():
-            outcome = 'Player has higher value. Player win'
+            wins+=1
+        elif PLAYER_HAND.get_value() > DEALER_HAND.get_value():
+            outcome = 'Player has higher value. Player wins'
+            wins+=1
         else:
             outcome = 'Dealer has higher value. Dealer wins.'
     in_play = False
-    print("Method complete")
    
     # if hand is in play, repeatedly hit dealer until his hand has value 17 or more
 
@@ -171,6 +181,7 @@ def draw(canvas):
     canvas.draw_text("PLAYER", [450,137],35,"Black")
     canvas.draw_text("DEALER", [450,463],35,"Black")
     canvas.draw_text(outcome,[text_constant,310],25,"Black")
+    canvas.draw_text("Player Wins: %s" % wins, [text_constant,340],25,"Black")
     if in_play == True:
         canvas.draw_image(card_back,CARD_BACK_CENTER,CARD_BACK_SIZE,(36,552),(CARD_SIZE))
 
