@@ -133,7 +133,6 @@ class Ship:
         self.angle_vel = multiple * ANGLE_VELOC
     def change_thrust(self,thrust):
         self.thrust = thrust
-        print(self.thrust)
     
 # Sprite class
 class Sprite:
@@ -154,10 +153,12 @@ class Sprite:
             sound.play()
    
     def draw(self, canvas):
-        canvas.draw_circle(self.pos, self.radius, 1, "Red", "Red")
+        canvas.draw_image(self.image,asteroid_info.get_center(),asteroid_info.get_size(), self.pos, self.image_size, self.angle )
     
     def update(self):
-        pass        
+        global DELTA_T, ANGLE_VELOC
+        self.pos = [self.pos[0]+self.vel[0]*DELTA_T,self.pos[1]+self.vel[1]*DELTA_T]
+        self.angle+=self.angle_vel*DELTA_T
 
            
 def draw(canvas):
@@ -174,17 +175,26 @@ def draw(canvas):
 
     # draw ship and sprites
     my_ship.draw(canvas)
-    a_rock.draw(canvas)
+    global a_rock
+    for rock in a_rock:
+        rock.draw(canvas)
+    #a_rock.draw(canvas)
     a_missile.draw(canvas)
     
     # update ship and sprites
     my_ship.update()
-    a_rock.update()
+    for rock in a_rock:
+        rock.update()
     a_missile.update()
             
 # timer handler that spawns a rock    
+#calls 3 every tick, which triggers every 5 seconds
 def rock_spawner():
-    pass
+    global a_rock
+    #a_rock = Sprite([random.randint(0,WIDTH),random.randint(0,HEIGHT)], [random.randint(-100,100), random.randint(-100,100)], random.randint(0,2*3), 0, asteroid_image, asteroid_info)
+    for i in range(3):
+        a_rock.append(Sprite([random.randint(0,WIDTH),random.randint(0,HEIGHT)], [random.randint(-50,50), random.randint(-50,50)], random.randint(-6,2*3), random.randint(-6,2*3), asteroid_image, asteroid_info))
+    print('test')
 
 def keydown_handler(key):
     if key == simplegui.KEY_MAP['right']:
@@ -193,7 +203,7 @@ def keydown_handler(key):
         my_ship.change_angle(-1)
     elif key == simplegui.KEY_MAP['up']:
         my_ship.change_thrust(True)
-    print('a')
+
 def keyup_handler(key):
     if key == simplegui.KEY_MAP['right'] or key == simplegui.KEY_MAP['left']:
         my_ship.change_angle(0)
@@ -205,15 +215,16 @@ frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 
 # initialize ship and two sprites
 my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info)
-a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [1, 1], 0, 0, asteroid_image, asteroid_info)
+#a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [50, 2], 0, 0, asteroid_image, asteroid_info)
+a_rock = []
 a_missile = Sprite([2 * WIDTH / 3, 2 * HEIGHT / 3], [-1,1], 0, 0, missile_image, missile_info, missile_sound)
 
 # register handlers
 frame.set_draw_handler(draw)
 frame.set_keydown_handler(keydown_handler)
 frame.set_keyup_handler(keyup_handler)
-timer = simplegui.create_timer(1000.0, rock_spawner)
-
+timer = simplegui.create_timer(5000.0, rock_spawner) #increased time to make life easier for playyer
+rock_spawner() #gets rocks on the canvas immediately
 # get things rolling
 timer.start()
 frame.start()
