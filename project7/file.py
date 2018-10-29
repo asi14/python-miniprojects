@@ -163,12 +163,16 @@ class Sprite:
     
     def update(self):
         global DELTA_T, ANGLE_VELOC
+        if self.pos[0]-self.radius < WIDTH and self.pos[0] + self.radius > 0 and self.pos[1] - self.radius < HEIGHT and self.pos[1] + self.radius > 0:
+            self.pos = [self.pos[0]+self.vel[0]*DELTA_T,self.pos[1]+self.vel[1]*DELTA_T]
+        else:
+            self.pos = [self.pos[0]%800, self.pos[1]%600]        
         self.pos = [self.pos[0]+self.vel[0]*DELTA_T,self.pos[1]+self.vel[1]*DELTA_T]
         self.angle+=self.angle_vel*DELTA_T
 
            
 def draw(canvas):
-    global time
+    global time,lives,score,WIDTH
     
     # animiate background
     time += 1
@@ -194,6 +198,9 @@ def draw(canvas):
         rock.update()
     for missile in my_ship.missiles:
         missile.update()
+        
+    canvas.draw_text("Lives: %s" %lives, [20,20],20,"White")
+    canvas.draw_text("Score: %s" %score, [WIDTH-80,20],20,"White")
             
 # timer handler that spawns a rock    
 #calls 3 every tick, which triggers every 5 seconds
