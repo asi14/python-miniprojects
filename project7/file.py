@@ -103,6 +103,7 @@ class Ship:
         self.image_center = info.get_center()
         self.image_size = info.get_size()
         self.radius = info.get_radius()
+        self.missiles = []
         
     def draw(self,canvas):
         if self.thrust:
@@ -133,6 +134,11 @@ class Ship:
         self.angle_vel = multiple * ANGLE_VELOC
     def change_thrust(self,thrust):
         self.thrust = thrust
+        
+    def shoot(self):
+        global missile_sound
+        self.missiles.append(Sprite(self.pos, [500*math.cos(self.angle),500*math.sin(self.angle)], self.angle, 0, missile_image, missile_info,missile_sound))
+        print('bam!')
     
 # Sprite class
 class Sprite:
@@ -153,7 +159,7 @@ class Sprite:
             sound.play()
    
     def draw(self, canvas):
-        canvas.draw_image(self.image,asteroid_info.get_center(),asteroid_info.get_size(), self.pos, self.image_size, self.angle )
+        canvas.draw_image(self.image,self.image_center,self.image_size, self.pos, self.image_size, self.angle )
     
     def update(self):
         global DELTA_T, ANGLE_VELOC
@@ -179,13 +185,15 @@ def draw(canvas):
     for rock in a_rock:
         rock.draw(canvas)
     #a_rock.draw(canvas)
-    a_missile.draw(canvas)
+    for missile in my_ship.missiles:
+        missile.draw(canvas)
     
     # update ship and sprites
     my_ship.update()
     for rock in a_rock:
         rock.update()
-    a_missile.update()
+    for missile in my_ship.missiles:
+        missile.update()
             
 # timer handler that spawns a rock    
 #calls 3 every tick, which triggers every 5 seconds
@@ -203,6 +211,8 @@ def keydown_handler(key):
         my_ship.change_angle(-1)
     elif key == simplegui.KEY_MAP['up']:
         my_ship.change_thrust(True)
+    elif key == simplegui.KEY_MAP['space']:
+        my_ship.shoot()
 
 def keyup_handler(key):
     if key == simplegui.KEY_MAP['right'] or key == simplegui.KEY_MAP['left']:
@@ -217,7 +227,7 @@ frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info)
 #a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [50, 2], 0, 0, asteroid_image, asteroid_info)
 a_rock = []
-a_missile = Sprite([2 * WIDTH / 3, 2 * HEIGHT / 3], [-1,1], 0, 0, missile_image, missile_info, missile_sound)
+#a_missile = Sprite([2 * WIDTH / 3, 2 * HEIGHT / 3], [-1,1], 0, 0, missile_image, missile_info, missile_sound)
 
 # register handlers
 frame.set_draw_handler(draw)
