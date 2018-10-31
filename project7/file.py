@@ -10,8 +10,9 @@ score = 0
 lives = 3
 time = 0
 DELTA_T=0.01
-ANGLE_VELOC = math.pi/100
-ACC=125
+ANGLE_VELOC = math.pi/75
+ACC=150
+MISSILE_AGE=75
 
 class ImageInfo:
     def __init__(self, center, size, radius = 0, lifespan = None, animated = False):
@@ -154,6 +155,7 @@ class Sprite:
         self.lifespan = info.get_lifespan()
         self.animated = info.get_animated()
         self.age = 0
+        self.isCollided=False #each astroied is by default not collided
         if sound:
             sound.rewind()
             sound.play()
@@ -169,10 +171,24 @@ class Sprite:
             self.pos = [self.pos[0]%800, self.pos[1]%600]        
         self.pos = [self.pos[0]+self.vel[0]*DELTA_T,self.pos[1]+self.vel[1]*DELTA_T]
         self.angle+=self.angle_vel*DELTA_T
+        self.age+=1
+    def collide(self,other_object):
+        range_x = [self.pos[0]-self.radius,self.pos[0]+self.radius]
+        range_y = [self.pos[1]-self.radius,self.pos[1]+self.radius]
+        if other_object.pos[0] > range_x[0] and other_object.pos[0] < range_x[1] and other_object.pos[1] > range_y[0] and other_object.pos[1] < range_y[1]:
+            self.isCollided=True #used to check if astroid is collided and is ignored later
+            return True
+        self.isCollided=False
+        return False
 
+def group_collide(sprite_list, other_object):
+    for sprite in sprite_list:
+        if sprite.isCollided==False and sprite.collide(other_object)==True: #ignores if isCollided already true
+            return True
+    return False
            
 def draw(canvas):
-    global time,lives,score,WIDTH
+    global time,lives,score,WIDTH, a_rock, MISSILE_AGE
     
     # animiate background
     time += 1
@@ -185,20 +201,23 @@ def draw(canvas):
 
     # draw ship and sprites
     my_ship.draw(canvas)
-    global a_rock
     for rock in a_rock:
-        rock.draw(canvas)
+        if rock.isCollided == False: rock.draw(canvas)
     #a_rock.draw(canvas)
     for missile in my_ship.missiles:
-        missile.draw(canvas)
+        if missile.age < MISSILE_AGE: missile.draw(canvas)
     
     # update ship and sprites
     my_ship.update()
     for rock in a_rock:
-        rock.update()
+        if rock.isCollided == False: rock.update()
     for missile in my_ship.missiles:
-        missile.update()
+        if missile.age < MISSILE_AGE: missile.update()
         
+    #collision checks
+    if group_collide(a_rock,my_ship)==True:
+        lives-=1
+    
     canvas.draw_text("Lives: %s" %lives, [20,20],20,"White")
     canvas.draw_text("Score: %s" %score, [WIDTH-80,20],20,"White")
             
